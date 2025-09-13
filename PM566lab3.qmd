@@ -1,0 +1,90 @@
+---
+title: "PM566 lab3"
+author: "Yuhan Meng"
+format:
+  html:
+    embed-resources: true
+---
+
+
+```{r}
+met <- read.csv("C:\\Users\\Hannah Meng\\Downloads\\met_all.gz")
+```
+
+```{r}
+dim(met)
+head(met)
+tail(met)
+```
+
+```{r}
+str(met)
+```
+
+```{r}
+table(met$year)
+table(met$day)
+table(met$hour)
+summary(met$temp)
+summary(met$elev)
+summary(met$wind.sp)
+```
+
+```{r}
+met$elev[met$elev == 9999.0] <- NA
+summary(met$elev)
+top_elev <- max(met$elev, na.rm = TRUE)    # <- na.rm=TRUE is crucial
+top_elev
+```
+
+```{r}
+met <- met[met$temp>-40,]
+met2 <- met[order(met$temp),]
+head(met2)
+```
+
+```{r}
+met <- met[met$temp>-15,]
+met2 <- met[order(met$temp),]
+head(met2)
+```
+
+```{r}
+elev<- met[met$elev==max(met$elev, na.rm=TRUE),]
+summary(elev)
+```
+
+```{r}
+cor(elev$temp,elev$wind.sp,use="complete")
+cor(elev$temp,elev$hour,use="complete")
+cor(elev$wind.sp,elev$day,use="complete")
+cor(elev$wind.sp,elev$hour, use="complete")
+cor(elev$temp,elev$day,use="complete")
+```
+
+```{r}
+hist(met$elev,breaks = 100)
+hist(met$temp)
+hist(met$wind.sp)
+```
+
+```{r}
+library(leaflet)
+leaflet(elev) %>%
+  addProviderTiles('OpenStreetMap') %>%
+  addCircles(lat=~lat,lng=~lon, opacity=1, fillOpacity=1, radius=100)
+```
+
+```{r}
+library(lubridate)
+elev$date <- with(elev, ymd_h(paste(year,month,day,hour,sep= ' ')))
+summary(elev$date)
+elev<-elev[order(elev$date),]
+head(elev)
+```
+
+```{r}
+plot(elev$date, elev$temp, type='l')
+plot(elev$date, elev$wind.sp, type='l')
+```
+
